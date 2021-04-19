@@ -68,6 +68,11 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
                         commit_title: `Merge pull request #${pr.number}`,
                         sha: pr.head.sha,
                     });
+                    await octokit.request('DELETE /repos/{owner}/{repo}/git/refs/{ref}', {
+                        owner,
+                        repo,
+                        ref: pr.head.ref,
+                    });
                 } else {
                     octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
                         owner,

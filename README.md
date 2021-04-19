@@ -33,7 +33,7 @@ repository-name:
 
 ```yaml
 name: Set reviewers or merge
-uses: KaMeHb-UA/auto-review-action@v1
+uses: KaMeHb-UA/auto-review-action@v2
 with:
   scheme-file: /github/home/review-scheme.yml
 env:
@@ -101,7 +101,7 @@ jobs:
           EOF
 
       - name: Set reviewers or merge
-        uses: KaMeHb-UA/auto-review-action@v1
+        uses: KaMeHb-UA/auto-review-action@v2
         with:
           scheme-file: /github/home/review-scheme.yml
         env:
