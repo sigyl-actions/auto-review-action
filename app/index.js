@@ -59,7 +59,7 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
                 console.error('FAIL: CANNOT FIND REVIEWER IN SCHEME. ABORTING...');
                 process.exit(1);
             } else {
-                const nextReviewer = reviewers[reviewerIdx];
+                const nextReviewer = reviewers[reviewerIdx + 1];
                 if(!nextReviewer){
                     await octokit.request('PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge', {
                         owner,
