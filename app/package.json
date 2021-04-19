@@ -1,0 +1,10 @@
+{
+    "dependencies": {
+        "octokit": "^1.0.3",
+        "yaml": "^1.10.2"
+    },
+    "type": "module",
+    "scripts": {
+        "start": "node index"
+    }
+}
