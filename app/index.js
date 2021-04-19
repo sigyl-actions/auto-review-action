@@ -44,7 +44,7 @@ function getTargetPR(list){
     const reviews = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
         repo,
-        pull_number: pr.id,
+        pull_number: pr.number,
         per_page: 100,
     });
     const lastReview = reviews.data[reviews.data.length - 1];
@@ -60,15 +60,15 @@ function getTargetPR(list){
                     await octokit.request('PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge', {
                         owner,
                         repo,
-                        pull_number: pr.id,
-                        commit_title: `Merge pull request #${pr.id}`,
+                        pull_number: pr.number,
+                        commit_title: `Merge pull request #${pr.number}`,
                         sha: pr.head.sha,
                     });
                 } else {
                     octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
                         owner,
                         repo,
-                        pull_number: pr.id,
+                        pull_number: pr.number,
                         reviewers: [ nextReviewer ],
                     });
                 }
@@ -78,7 +78,7 @@ function getTargetPR(list){
         octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
             owner,
             repo,
-            pull_number: pr.id,
+            pull_number: pr.number,
             reviewers: [ reviewers[0] ],
         });
     }
