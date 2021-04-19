@@ -29,10 +29,10 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
  * @param {T[]} list
  * @return {T}
  */
- function getTargetPR(list){
+ function getTargetPR(list, sha){
     for(const pr of list){
         // @ts-ignore
-        if(pr.head.sha === GITHUB_SHA) return pr;
+        if(pr.head.sha === sha) return pr;
     }
 }
 
@@ -43,7 +43,7 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
         per_page: 100,
     });
     /** @type {typeof list.data[0]} */
-    const pr = eventData.pull_request || getTargetPR(list.data);
+    const pr = eventData.pull_request || getTargetPR(list.data, GITHUB_SHA) || getTargetPR(list.data, eventData.workflow_run.head_commit.id);
     const reviewers = repoReviewers[pr.user.login];
     const reviews = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
