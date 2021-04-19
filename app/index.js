@@ -12,34 +12,20 @@ const {
     GITHUB_TOKEN,
     GITHUB_SHA,
     GITHUB_REPOSITORY,
+    GITHUB_EVENT_PATH,
 } = process.env;
 
 const [ owner, repo ] = GITHUB_REPOSITORY.split('/');
+
+const eventData = JSON.parse(readFileSync(GITHUB_EVENT_PATH, 'utf8'));
 
 /** @type {{[x: string]: string[]}} */
 const repoReviewers = YAML.parse(readFileSync(REVIEW_SCHEME_FILE, 'utf8'))[repo];
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-/**
- * @template T
- * @param {T[]} list
- * @return {T}
- */
-function getTargetPR(list){
-    for(const pr of list){
-        // @ts-ignore
-        if(pr.head.sha === GITHUB_SHA) return pr;
-    }
-}
-
 (async () => {
-    const list = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
-        owner,
-        repo,
-        per_page: 100,
-    });
-    const pr = getTargetPR(list.data);
+    const pr = eventData.pull_request;
     const reviewers = repoReviewers[pr.user.login];
     const reviews = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
