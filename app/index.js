@@ -48,7 +48,7 @@ function getTargetPR(list){
         per_page: 100,
     });
     const lastReview = reviews.data[reviews.data.length - 1];
-    if(lastReview.commit_id === pr.head.sha){
+    if(lastReview?.commit_id === pr.head.sha){
         if(lastReview.state === 'APPROVED'){
             const reviewerIdx = reviewers.indexOf(lastReview.user.login);
             if(reviewerIdx === -1){
