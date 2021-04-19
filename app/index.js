@@ -24,8 +24,26 @@ const repoReviewers = YAML.parse(readFileSync(REVIEW_SCHEME_FILE, 'utf8'))[repo]
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
+/**
+ * @template T
+ * @param {T[]} list
+ * @return {T}
+ */
+ function getTargetPR(list){
+    for(const pr of list){
+        // @ts-ignore
+        if(pr.head.sha === GITHUB_SHA) return pr;
+    }
+}
+
 (async () => {
-    const pr = eventData.pull_request;
+    const list = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
+        owner,
+        repo,
+        per_page: 100,
+    });
+    /** @type {typeof list.data[0]} */
+    const pr = eventData.pull_request || getTargetPR(list.data);
     const reviewers = repoReviewers[pr.user.login];
     const reviews = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
