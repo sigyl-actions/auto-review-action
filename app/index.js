@@ -1,7 +1,7 @@
 // @ts-check
 import YAML from 'yaml'
 import { readFileSync } from 'fs'
-import { Octokit } from 'octokit'
+import { Octokit } from '@octokit/core'
 
 const [
     ,,
@@ -34,10 +34,14 @@ function getTargetPR(list){
 }
 
 (async () => {
-    const list = await octokit.rest.pulls.list();
+    const list = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
+        owner,
+        repo,
+        per_page: 100,
+    });
     const pr = getTargetPR(list.data);
     const reviewers = repoReviewers[pr.user.login];
-    const reviews = await octokit.rest.pulls.listReviews({
+    const reviews = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
         repo,
         pull_number: pr.id,
@@ -53,7 +57,7 @@ function getTargetPR(list){
             } else {
                 const nextReviewer = reviewers[reviewerIdx];
                 if(!nextReviewer){
-                    await octokit.rest.pulls.merge({
+                    await octokit.request('PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge', {
                         owner,
                         repo,
                         pull_number: pr.id,
@@ -61,16 +65,17 @@ function getTargetPR(list){
                         sha: pr.head.sha,
                     });
                 } else {
-                    await octokit.rest.pulls.requestReviewers({
+                    octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
                         owner,
                         repo,
+                        pull_number: pr.id,
                         reviewers: [ nextReviewer ],
                     });
                 }
             }
         }
     } else {
-        await octokit.rest.pulls.requestReviewers({
+        octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
             owner,
             repo,
             pull_number: pr.id,
