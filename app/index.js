@@ -71,7 +71,7 @@ const octokit = new Octokit({ auth: GITHUB_TOKEN });
                     await octokit.request('DELETE /repos/{owner}/{repo}/git/refs/{ref}', {
                         owner,
                         repo,
-                        ref: pr.head.ref,
+                        ref: 'heads/' + pr.head.ref,
                     });
                 } else {
                     octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
