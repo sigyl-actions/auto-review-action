@@ -1,7 +1,7 @@
 // @ts-check
-import YAML from 'yaml'
-import { readFileSync } from 'fs'
-import { Octokit } from '@octokit/core'
+const YAML = require('yaml');
+const { readFileSync } = require('fs');
+const { Octokit } = require('@octokit/core');
 
 const [
     ,,

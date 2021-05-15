@@ -1,14 +1,16 @@
-name: 'Auto review action'
-description: 'Automatically adds reviewers to pull request and merges them to help you to deal with thunk-like workflows'
+name: Auto review action
+description: Automatically adds reviewers to pull request and merges them to help you to deal with thunk-like workflows
 
 inputs:
   scheme-file:
-    description: 'File with review scheme'
+    description: File with review scheme
     required: true
     default: ''
+  mode:
+    description: Reviewers setting mode — single (assigns one reviewer at once) or multiple
+    required: false
+    default: multiple
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.scheme-file }}
+  using: node12
+  main: app/index.js
