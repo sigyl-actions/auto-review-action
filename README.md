@@ -101,7 +101,7 @@ jobs:
           EOF
 
       - name: Set reviewers or merge
-        uses: KaMeHb-UA/auto-review-action@v4
+        uses: KaMeHb-UA/auto-review-action@v7
         with:
           scheme-file: /github/home/review-scheme.yml
         env:
