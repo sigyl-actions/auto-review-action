@@ -1,7 +1,7 @@
 const YAML = require('yaml');
 const { readFileSync } = require('fs');
 const { Octokit } = require('@octokit/core');
-const { schemeFile, mode } = require('./inputs.js');
+const { schemeFile, mode, type } = require('./inputs.js');
 
 /**
  * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls'>[0]} PR
@@ -17,8 +17,10 @@ const {
 
 const [ owner, repo ] = GITHUB_REPOSITORY.split('/');
 
+const yaml = YAML.parse(readFileSync(schemeFile, 'utf8'));
+
 /** @type {{[x: string]: string[]}} */
-const repoReviewers = YAML.parse(readFileSync(schemeFile, 'utf8'))[repo];
+const repoReviewers = type === 'centralized' ? yaml[repo] : type === 'distributed' ? yaml : {};
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 

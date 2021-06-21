@@ -10,6 +10,10 @@ inputs:
     description: Reviewers setting mode — single (assigns one reviewer at once) or multiple
     required: false
     default: multiple
+  type:
+    description: Reviewers scheme file type - centralized (with top-level repository map) or distributed (PR authors at the top level)
+    required: false
+    default: centralized
 
 runs:
   using: node12
