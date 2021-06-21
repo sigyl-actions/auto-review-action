@@ -96,13 +96,13 @@ async function main(pr, reviewers, reviews, single){
     const reviewMap = {};
     // get LAST user reviews
     for(const review of reviews) reviewMap[review.user.login] = review.state;
-    console.log('Review map:\n' + reviewMap);
+    console.log('Review map:\n' + YAML.stringify(reviewMap));
     const reviewedBy = Object.keys(reviewMap);
     for(const revBy of reviewedBy){
         if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
     }
     const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
-    console.log('Approvals:\n' + approvals);
+    console.log('Approvals:\n' + YAML.stringify(approvals));
     const rest = getRestReviewers(approvals, reviewers);
     if(!rest.length){
         console.log('There is no rest reviewers. Merging...');
