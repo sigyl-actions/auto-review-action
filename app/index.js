@@ -70,52 +70,34 @@ async function requestReviewers(pr, reviewers){
     });
 }
 
-/**
- * @arg {PR} pr
- * @arg {string[]} reviewers
- * @arg {Review[]} reviews
- */
-async function singleMode(pr, reviewers, reviews){
-    if(reviews.length){
-        const lastReview = reviews[reviews.length - 1];
-        if(lastReview.state === 'APPROVED'){
-            const reviewerIdx = reviewers.indexOf(lastReview.user.login);
-            if(reviewerIdx === -1){
-                console.warn(`cannot find reviewer ${lastReview.user.login} in scheme`);
-            } else {
-                const nextReviewer = reviewers[reviewerIdx + 1];
-                if(!nextReviewer){
-                    await merge(pr);
-                } else {
-                    await requestReviewers(pr.number, [ nextReviewer ]);
-                }
-            }
-        }
-    } else {
-        await requestReviewers(pr.number, [ reviewers[0] ]);
+function getRestReviewers(approvals, reviewers){
+    const rest = [];
+    for(const reviewer of reviewers){
+        if(!approvals.includes(reviewer)) rest.push(reviewer);
     }
+    return rest;
 }
 
 /**
  * @arg {PR} pr
  * @arg {string[]} reviewers
  * @arg {Review[]} reviews
+ * @arg {boolean} single
  */
-async function multipleMode(pr, reviewers, reviews){
-    if(reviews.length){
-        const reviewMap = {};
-        // get LAST user reviews
-        for(const review of reviews) reviewMap[review.user.login] = review.state;
-        const reviewedBy = Object.keys(reviewMap);
-        for(const revBy of reviewedBy){
-            if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
-        }
-        const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
-        if(approvals.length === reviewers.length){
-            await merge(pr);
-        }
+async function main(pr, reviewers, reviews, single){
+    const reviewMap = {};
+    // get LAST user reviews
+    for(const review of reviews) reviewMap[review.user.login] = review.state;
+    const reviewedBy = Object.keys(reviewMap);
+    for(const revBy of reviewedBy){
+        if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
+    }
+    const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
+    const rest = getRestReviewers(approvals, reviewers);
+    if(!rest.length){
+        await merge(pr);
     } else {
-        await requestReviewers(pr.number, reviewers);
+        await requestReviewers(pr.number, single ? [ rest[0] ] : rest);
     }
 }
 
@@ -131,9 +113,8 @@ async function multipleMode(pr, reviewers, reviews){
         })).data || []).filter(v => v.commit_id === pr.head.sha);
         switch(mode){
             case 'single':
-                return await singleMode(pr, reviewers, reviews);
             case 'multiple':
-                return await multipleMode(pr, reviewers, reviews);
+                await main(pr, reviewers, reviews, mode === 'single');
         }
     } catch(e){
         console.log('::error::' + e.message);
