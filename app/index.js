@@ -70,6 +70,10 @@ async function requestReviewers(pr, reviewers){
     });
 }
 
+/**
+ * @arg {string[]} approvals
+ * @arg {string[]} reviewers
+ */
 function getRestReviewers(approvals, reviewers){
     const rest = [];
     for(const reviewer of reviewers){
