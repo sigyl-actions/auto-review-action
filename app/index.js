@@ -110,7 +110,7 @@ async function main(pr, reviewers, reviews, single){
 (async () => {
     try{
         const pr = await getTargetPR();
-        const reviewers = repoReviewers[pr.user.login];
+        const reviewers = repoReviewers[pr.user.login] || repoReviewers['*'];
         const reviews = ((await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
             owner,
             repo,
