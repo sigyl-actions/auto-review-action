@@ -22,6 +22,8 @@ const yaml = YAML.parse(readFileSync(schemeFile, 'utf8'));
 /** @type {{[x: string]: string[]}} */
 const repoReviewers = type === 'centralized' ? yaml[repo] : type === 'distributed' ? yaml : {};
 
+console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
+
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 function getTargetPRFromList(list, sha){
@@ -94,33 +96,43 @@ async function main(pr, reviewers, reviews, single){
     const reviewMap = {};
     // get LAST user reviews
     for(const review of reviews) reviewMap[review.user.login] = review.state;
+    console.log('Review map:\n' + reviewMap);
     const reviewedBy = Object.keys(reviewMap);
     for(const revBy of reviewedBy){
         if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
     }
     const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
+    console.log('Approvals:\n' + approvals);
     const rest = getRestReviewers(approvals, reviewers);
     if(!rest.length){
+        console.log('There is no rest reviewers. Merging...');
         await merge(pr);
     } else {
-        await requestReviewers(pr.number, single ? [ rest[0] ] : rest);
+        const reviewerList = single ? [ rest[0] ] : rest;
+        console.log('There rest reviewers:\n' + YAML.stringify(rest) + '\nRequesting reviews from:\n' + YAML.stringify(reviewerList));
+        await requestReviewers(pr.number, reviewerList);
     }
 }
 
 (async () => {
     try{
         const pr = await getTargetPR();
+        console.log('Target PR:\n' + YAML.stringify(pr));
         const reviewers = repoReviewers[pr.user.login] || repoReviewers['*'];
+        console.log('Reviewers:\n' + YAML.stringify(reviewers));
         const reviews = ((await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
             owner,
             repo,
             pull_number: pr.number,
             per_page: 100,
         })).data || []).filter(v => v.commit_id === pr.head.sha);
+        console.log('Reviews:\n' + YAML.stringify(reviews));
         switch(mode){
             case 'single':
             case 'multiple':
                 await main(pr, reviewers, reviews, mode === 'single');
+            default:
+                throw new Error('mode can be only single or multiple');
         }
     } catch(e){
         console.log('::error::' + e.message);
