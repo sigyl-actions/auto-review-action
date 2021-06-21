@@ -81,7 +81,7 @@ async function singleMode(pr, reviewers, reviews){
         if(lastReview.state === 'APPROVED'){
             const reviewerIdx = reviewers.indexOf(lastReview.user.login);
             if(reviewerIdx === -1){
-                throw new Error(`cannot find reviewer ${lastReview.user.login} in scheme. Aborting...`);
+                console.warn(`cannot find reviewer ${lastReview.user.login} in scheme`);
             } else {
                 const nextReviewer = reviewers[reviewerIdx + 1];
                 if(!nextReviewer){
@@ -108,7 +108,7 @@ async function multipleMode(pr, reviewers, reviews){
         for(const review of reviews) reviewMap[review.user.login] = review.state;
         const reviewedBy = Object.keys(reviewMap);
         for(const revBy of reviewedBy){
-            if(!reviewers.includes(revBy)) throw new Error(`cannot find reviewer ${revBy} in scheme. Aborting...`);
+            if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
         }
         const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
         if(approvals.length === reviewers.length){
