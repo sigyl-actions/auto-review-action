@@ -126,6 +126,7 @@ async function main(pr, reviewers, reviews, single){
             pull_number: pr.number,
             per_page: 100,
         })).data || []).filter(v => v.commit_id === pr.head.sha);
+        if(!reviews) throw new Error('reviewers for author ' + pr.user.login + ' isn\'t defined. Try to define wildcard rule for any author named with "*"');
         console.log('Reviews:\n' + YAML.stringify(reviews));
         switch(mode){
             case 'single':
