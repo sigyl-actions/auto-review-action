@@ -102,7 +102,7 @@ async function main(pr, reviewers, reviews, single){
     for(const revBy of reviewedBy){
         if(!reviewers.includes(revBy)) console.warn(`cannot find reviewer ${revBy} in scheme`);
     }
-    const approvals = reviewedBy.map(i => reviewMap[i]).filter(v => v === 'APPROVED');
+    const approvals = reviewedBy.filter(i => reviewMap[i] === 'APPROVED');
     console.log('Approvals:\n' + YAML.stringify(approvals));
     const rest = getRestReviewers(approvals, reviewers);
     if(!rest.length){
