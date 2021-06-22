@@ -19,7 +19,9 @@ const [ owner, repo ] = GITHUB_REPOSITORY.split('/');
 const yaml = YAML.parse(readFileSync(schemeFile, 'utf8'));
 
 /** @type {{[x: string]: string[]}} */
-const repoReviewers = ['centralized', undefined].includes(type) ? yaml[repo] : type === 'distributed' ? yaml : {};
+const repoReviewers = [ 'centralized', undefined ].includes(type) ? yaml[repo] : type === 'distributed' ? yaml : (() => {
+    throw new Error('type can be only centralized or distributed');
+})();
 
 console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 
@@ -127,14 +129,8 @@ async function main(pr, reviewers, reviews, single){
         })).data || []).filter(v => v.commit_id === pr.head.sha);
         if(!reviews) throw new Error('reviewers for author ' + pr.user.login + ' isn\'t defined. Try to define wildcard rule for any author named with "*"');
         console.log('Reviews:\n' + YAML.stringify(reviews));
-        switch(mode){
-            case 'single':
-            case 'multiple':
-            case undefined:
-                await main(pr, reviewers, reviews, mode === 'single');
-            default:
-                throw new Error('mode can be only single or multiple');
-        }
+        if([ 'single', 'multiple', undefined ].includes(mode)) await main(pr, reviewers, reviews, mode === 'single');
+        else throw new Error('mode can be only single or multiple');
     } catch(e){
         console.log('::error::' + e.message);
         process.exit(1);
