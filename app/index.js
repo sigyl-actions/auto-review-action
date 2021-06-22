@@ -1,7 +1,7 @@
 const YAML = require('yaml');
 const { readFileSync } = require('fs');
 const { Octokit } = require('@octokit/core');
-const { schemeFile, mode, type } = require('./inputs.js');
+const { schemeFile, mode, type, token } = require('./inputs.js');
 
 /**
  * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls'>[0]} PR
@@ -9,7 +9,6 @@ const { schemeFile, mode, type } = require('./inputs.js');
  */
 
 const {
-    GITHUB_TOKEN,
     GITHUB_SHA,
     GITHUB_REPOSITORY,
     GITHUB_EVENT_PATH,
@@ -24,7 +23,7 @@ const repoReviewers = ['centralized', undefined].includes(type) ? yaml[repo] : t
 
 console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 
-const octokit = new Octokit({ auth: GITHUB_TOKEN });
+const octokit = new Octokit({ auth: token });
 
 function getTargetPRFromList(list, sha){
     for(const pr of list) if(pr.head.sha === sha) return pr;

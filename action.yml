@@ -6,6 +6,10 @@ inputs:
     description: File with review scheme
     required: true
     default: ''
+  token:
+    description: Token for work with GH Actions
+    required: true
+    default: ''
   mode:
     description: Reviewers setting mode — single (assigns one reviewer at once) or multiple
     required: false
