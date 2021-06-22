@@ -20,7 +20,7 @@ const [ owner, repo ] = GITHUB_REPOSITORY.split('/');
 const yaml = YAML.parse(readFileSync(schemeFile, 'utf8'));
 
 /** @type {{[x: string]: string[]}} */
-const repoReviewers = type === 'centralized' ? yaml[repo] : type === 'distributed' ? yaml : {};
+const repoReviewers = ['centralized', undefined].includes(type) ? yaml[repo] : type === 'distributed' ? yaml : {};
 
 console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 
@@ -131,6 +131,7 @@ async function main(pr, reviewers, reviews, single){
         switch(mode){
             case 'single':
             case 'multiple':
+            case undefined:
                 await main(pr, reviewers, reviews, mode === 'single');
             default:
                 throw new Error('mode can be only single or multiple');
