@@ -76,13 +76,13 @@ async function requestReviewers(pr, reviewers){
 }
 
 /**
- * @arg {string[]} approvals
+ * @arg {string[]} reviews
  * @arg {string[]} reviewers
  */
-function getRestReviewers(approvals, reviewers){
+function getRestReviewers(reviews, reviewers){
     const rest = [];
     for(const reviewer of reviewers){
-        if(!approvals.includes(reviewer)) rest.push(reviewer);
+        if(!reviews.includes(reviewer)) rest.push(reviewer);
     }
     return rest;
 }
@@ -104,7 +104,7 @@ async function main(pr, reviewers, reviews, single){
     }
     const approvals = reviewedBy.filter(i => reviewMap[i] === 'APPROVED');
     console.log('Approvals:\n' + YAML.stringify(approvals));
-    const rest = getRestReviewers(approvals, reviewers);
+    const rest = getRestReviewers(reviewedBy, reviewers);
     if(!rest.length){
         console.log('There are no rest reviewers. Merging...');
         await merge(pr);
