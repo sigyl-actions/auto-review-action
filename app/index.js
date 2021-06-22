@@ -106,11 +106,11 @@ async function main(pr, reviewers, reviews, single){
     console.log('Approvals:\n' + YAML.stringify(approvals));
     const rest = getRestReviewers(approvals, reviewers);
     if(!rest.length){
-        console.log('There is no rest reviewers. Merging...');
+        console.log('There are no rest reviewers. Merging...');
         await merge(pr);
     } else {
         const reviewerList = single ? [ rest[0] ] : rest;
-        console.log('There rest reviewers:\n' + YAML.stringify(rest) + '\nRequesting reviews from:\n' + YAML.stringify(reviewerList));
+        console.log('There are rest reviewers:\n' + YAML.stringify(rest) + '\nRequesting reviews from:\n' + YAML.stringify(reviewerList));
         await requestReviewers(pr.number, reviewerList);
     }
 }
