@@ -105,9 +105,15 @@ async function main(pr, reviewers, reviews, single){
     const approvals = reviewedBy.filter(i => reviewMap[i] === 'APPROVED');
     console.log('Approvals:\n' + YAML.stringify(approvals));
     const rest = getRestReviewers(reviewedBy, reviewers);
+    const restApprovals = getRestReviewers(approvals, reviewers);
     if(!rest.length){
-        console.log('There are no rest reviewers. Merging...');
-        await merge(pr);
+        if(!restApprovals.length){
+            console.log('There are no rest reviewers. Merging...');
+            await merge(pr);
+        } else {
+            const last = restApprovals.pop();
+            console.log('There are no rest reviewers but PR isn\'t approved by ' + [restApprovals.join(', '), last].filter(v => v).join(' and ') + ' yet');
+        }
     } else {
         const reviewerList = single ? [ rest[0] ] : rest;
         console.log('There are rest reviewers:\n' + YAML.stringify(rest) + '\nRequesting reviews from:\n' + YAML.stringify(reviewerList));
