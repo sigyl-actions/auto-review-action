@@ -4,14 +4,13 @@ const { Octokit } = require('@octokit/core');
 const { schemeFile, mode, type, token } = require('./inputs.js');
 
 /**
- * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls'>[0]} PR
+ * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls/{pull_number}'>} PR
  * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews'>[0]} Review
  */
 
 const {
-    GITHUB_SHA,
     GITHUB_REPOSITORY,
-    GITHUB_EVENT_PATH,
+    GITHUB_REF,
 } = process.env;
 
 const [ owner, repo ] = GITHUB_REPOSITORY.split('/');
@@ -27,23 +26,13 @@ console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 
 const octokit = new Octokit({ auth: token });
 
-function getTargetPRFromList(list, sha){
-    for(const pr of list) if(pr.head.sha === sha) return pr;
-}
-
 async function getTargetPR(){
-    const eventData = JSON.parse(readFileSync(GITHUB_EVENT_PATH, 'utf8'));
-    /** @type {PR} */
-    let pr = eventData.pull_request;
-    if(!eventData.pull_request){
-        const list = await octokit.request('GET /repos/{owner}/{repo}/pulls', {
-            owner,
-            repo,
-            per_page: 100,
-        });
-        pr = getTargetPRFromList(list.data, GITHUB_SHA) || getTargetPRFromList(list.data, eventData.workflow_run.head_commit.id);
-    }
-    return pr;
+    const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+        owner,
+        repo,
+        pull_number: GITHUB_REF.slice(10, -6),
+    });
+    return data;
 }
 
 /** @arg {PR} pr */
