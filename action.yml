@@ -18,6 +18,10 @@ inputs:
     description: Reviewers scheme file type - centralized (with top-level repository map) or distributed (PR authors at the top level)
     required: false
     default: centralized
+  ref:
+    description: Ref to current PR
+    required: false
+    default: ''
 
 runs:
   using: node12
