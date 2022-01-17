@@ -1,7 +1,7 @@
 const YAML = require('yaml');
 const { readFileSync } = require('fs');
 const { Octokit } = require('@octokit/core');
-const { schemeFile, mode, type, token } = require('./inputs.js');
+const { schemeFile, mode, type, token, ref } = require('./inputs.js');
 
 /**
  * @typedef {import('./@typings/helpers').OctokitResult<'GET /repos/{owner}/{repo}/pulls/{pull_number}'>} PR
@@ -30,7 +30,7 @@ async function getTargetPR(){
     const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
         owner,
         repo,
-        pull_number: GITHUB_REF.slice(10, -6),
+        pull_number: (ref || GITHUB_REF).slice(10, -6),
     });
     return data;
 }
