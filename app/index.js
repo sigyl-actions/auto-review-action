@@ -112,6 +112,7 @@ async function main(pr, reviewers, reviews, single){
 
 (async () => {
     try{
+        console.log('i did get here');
         const pr = await getTargetPR();
         console.log('Target PR:\n' + YAML.stringify(pr));
         const reviewers = repoReviewers[pr.user.login] || repoReviewers['*'];
