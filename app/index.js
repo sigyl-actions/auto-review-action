@@ -27,6 +27,11 @@ console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 const octokit = new Octokit({ auth: token });
 
 async function getTargetPR(){
+    console.log({
+        owner,
+        repo,
+        pull_number: (ref || GITHUB_REF).slice(10, -6),
+    });
     const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
         owner,
         repo,
