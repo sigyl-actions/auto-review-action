@@ -27,15 +27,6 @@ console.log('Repository reviewers:\n' + YAML.stringify(repoReviewers));
 const octokit = new Octokit({ auth: token });
 
 async function getTargetPR(){
-    console.log({
-        owner,
-        repo,
-        pull_number: (ref || GITHUB_REF).slice(10, -6),
-        env: process.env,
-        GITHUB_REF,
-        pr: GITHUB_REF.split('/')[2],
-        ref,
-    });
     const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
         owner,
         repo,
@@ -79,6 +70,7 @@ async function requestReviewers(pr, reviewers){
  */
 function getRestReviewers(reviews, reviewers){
     const rest = [];
+    console.log({ reviews })
     for(const reviewer of reviewers){
         if(!reviews.includes(reviewer)) rest.push(reviewer);
     }
@@ -121,7 +113,6 @@ async function main(pr, reviewers, reviews, single){
 
 (async () => {
     try{
-        console.log('i did get here');
         const pr = await getTargetPR();
         console.log('Target PR:\n' + YAML.stringify(pr));
         const reviewers = repoReviewers[pr.user.login] || repoReviewers['*'];
