@@ -36,7 +36,7 @@ async function getTargetPR(){
         pr: GITHUB_REF.split('/')[2],
         ref,
     });
-    const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/3', {
+    const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
         owner,
         repo,
         pull_number: GITHUB_REF.split('/')[2],
