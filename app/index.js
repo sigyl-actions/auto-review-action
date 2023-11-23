@@ -84,6 +84,7 @@ function getRestReviewers(reviews, reviewers){
  * @arg {boolean} single
  */
 async function main(pr, reviewers, reviews, single){
+  console.log({ maineReviewers: reviewers })
     const reviewMap = {};
     // get LAST user reviews
     for(const review of reviews) reviewMap[review.user.login] = review.state;
