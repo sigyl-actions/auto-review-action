@@ -116,6 +116,8 @@ async function main(pr, reviewers, reviews, single){
     try{
         const pr = await getTargetPR();
         console.log('Target PR:\n' + YAML.stringify(pr));
+        console.log(repoReviewers)
+        console.log(pr.user.login)
         const reviewers = repoReviewers[pr.user.login] || repoReviewers['*'];
         console.log('Reviewers:\n' + YAML.stringify(reviewers));
         const reviews = ((await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
